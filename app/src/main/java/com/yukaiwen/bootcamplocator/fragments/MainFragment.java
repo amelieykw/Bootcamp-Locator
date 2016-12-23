@@ -1,8 +1,10 @@
 package com.yukaiwen.bootcamplocator.fragments;
 
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +25,7 @@ import com.yukaiwen.bootcamplocator.R;
 public class MainFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private MarkerOptions userMarker; // store a marker before using it in the function
 
     public MainFragment() {
         // Required empty public constructor
@@ -67,11 +70,24 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+//
+//        // Add a marker in Sydney and move the camera
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    /**
+     * Show user's current location
+     * @param latLng
+     */
+    public void setUserMarker(LatLng latLng) {
+        if (userMarker == null) {
+            userMarker = new MarkerOptions().position(latLng).title("Current Location");
+            mMap.addMarker(userMarker);
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            Log.v("DONKEY", "Current location: " + latLng.latitude + "long: " + latLng.longitude);
+        }
     }
 
 }

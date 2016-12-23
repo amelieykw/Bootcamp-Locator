@@ -16,6 +16,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.yukaiwen.bootcamplocator.R;
 import com.yukaiwen.bootcamplocator.fragments.MainFragment;
 
@@ -23,6 +24,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.On
 
     final int PERMISSION_LOCATION = 111; //arbitrary number
     private GoogleApiClient mGoogleApiClient;
+    private MainFragment mainFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +81,7 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.On
     @Override
     public void onLocationChanged(Location location) {
         Log.v("DONKEY", "Long: " + location.getLongitude() + "Lat: " + location.getLatitude());
+        mainFragment.setUserMarker(new LatLng(location.getLongitude(), location.getLatitude()));
     }
 
     /**
