@@ -1,13 +1,18 @@
 package com.yukaiwen.bootcamplocator.fragments;
 
 
-import android.location.Location;
+import android.content.Context;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.location.Address;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,7 +25,10 @@ import com.yukaiwen.bootcamplocator.R;
 import com.yukaiwen.bootcamplocator.model.OneSpecificLocation;
 import com.yukaiwen.bootcamplocator.services.DataService;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -59,6 +67,26 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        final EditText zipText = (EditText)view.findViewById(R.id.zip_text);
+        zipText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+                if(keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    //You should make sure this is a valid zip code - check total count and characters
+                    String text = zipText.getText().toString();
+                    int zip = Integer.parseInt(text);
+
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(zipText.getWindowToken(), 0); //hiding the soft keyboard
+
+                    updateMapForZip(zip);
+
+                    return true;
+                }
+                return false;
+            }
+        });
+
         // Inflate the layout for this fragment
         return view;
     }
@@ -91,6 +119,21 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
             userMarker = new MarkerOptions().position(latLng).title("Current Location");
             mMap.addMarker(userMarker);
             Log.v("DONKEY", "Current location: " + latLng.latitude + "long: " + latLng.longitude);
+        }
+
+        /*
+         * The map will get the current location of the user
+         * and update the map view by the current zip code
+         * if the user just move around.
+         * The user dosen't need to enter the zip again manually.
+         */
+        try{
+            Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+            List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+            int zip = Integer.parseInt(addresses.get(0).getPostalCode());
+            updateMapForZip(zip);
+        } catch(IOException exception) {
+
         }
 
         updateMapForZip(92284);
