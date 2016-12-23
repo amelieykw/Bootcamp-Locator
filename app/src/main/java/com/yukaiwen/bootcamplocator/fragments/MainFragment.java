@@ -13,9 +13,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.yukaiwen.bootcamplocator.R;
+import com.yukaiwen.bootcamplocator.model.OneSpecificLocation;
+import com.yukaiwen.bootcamplocator.services.DataService;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -85,8 +90,25 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
         if (userMarker == null) {
             userMarker = new MarkerOptions().position(latLng).title("Current Location");
             mMap.addMarker(userMarker);
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             Log.v("DONKEY", "Current location: " + latLng.latitude + "long: " + latLng.longitude);
+        }
+
+        updateMapForZip(92284);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+    }
+
+    private void updateMapForZip(int zipcode) {
+        //pretending to download the locations from the internet
+        ArrayList<OneSpecificLocation> locations = DataService.getInstance().getBootcampLocationsWithin10MilesOfZip(zipcode);
+
+        //set each location's marker details
+        for (int x = 0; x < locations.size(); x++) {
+            OneSpecificLocation loc = locations.get(x);
+            MarkerOptions marker = new MarkerOptions().position(new LatLng(loc.getLatitude(), loc.getLongitude()));
+            marker.title(loc.getLocationTitle());
+            marker.snippet(loc.getLocationAddress());
+            marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_pin));
+            mMap.addMarker(marker);
         }
     }
 
