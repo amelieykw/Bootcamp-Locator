@@ -39,6 +39,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private MarkerOptions userMarker; // store a marker before using it in the function
+    private LocationsListFragment mListFragment;
 
     public MainFragment() {
         // Required empty public constructor
@@ -67,6 +68,16 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        mListFragment = (LocationsListFragment)getActivity().getSupportFragmentManager().findFragmentById(R.id.container_Location_list);
+
+        if (mListFragment == null) {
+            mListFragment = LocationsListFragment.newInstance();
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.container_Location_list, mListFragment)
+                    .commit();
+        }
+
         final EditText zipText = (EditText)view.findViewById(R.id.zip_text);
         zipText.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -79,6 +90,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
                     InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(zipText.getWindowToken(), 0); //hiding the soft keyboard
 
+                    showList(); //whenever the user enter the zip code, show the list of locations
                     updateMapForZip(zip);
 
                     return true;
@@ -87,6 +99,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        hideList();
         // Inflate the layout for this fragment
         return view;
     }
@@ -153,6 +166,14 @@ public class MainFragment extends Fragment implements OnMapReadyCallback {
             marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_pin));
             mMap.addMarker(marker);
         }
+    }
+
+    private void hideList() {
+        getActivity().getSupportFragmentManager().beginTransaction().hide(mListFragment);
+    }
+
+    private void showList() {
+        getActivity().getSupportFragmentManager().beginTransaction().show(mListFragment);
     }
 
 }

@@ -6,6 +6,8 @@ package com.yukaiwen.bootcamplocator.model;
 
 public class OneSpecificLocation {
 
+    final String DRAWABLE = "drawable/";
+
     private float longitude;
     private float latitude;
     private String locationTitle;
@@ -18,6 +20,10 @@ public class OneSpecificLocation {
         this.locationTitle = locationTitle;
         this.locationAddress = locationAddress;
         this.locationImrUrl = locationImrUrl;
+    }
+
+    public String getImgUrl() {
+        return DRAWABLE + locationImrUrl;
     }
 
     public float getLongitude() {
